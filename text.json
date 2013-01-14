@@ -1,0 +1,33 @@
+{content: [
+
+	{
+		title: "Wagner Paz",
+		image: "wagner-paz.png",
+		text: ["Hello! My name is Wagner Paz,",
+		       "It's nice to meet you!",
+		       "(Press SPACE to continue..)"]
+	},
+
+	{
+		title: "Wagner Paz",
+		image: "wagner-paz.png",
+		text: ["I'm here to show you my new Crafty component.",
+		       "It's called MessageBox (pretty obvious, no?)"]
+	},
+
+	{
+		title: "Wagner Paz",
+		image: "wagner-paz.png",
+		text: ["It's a customizable RPG-like message box component.",
+		       "The text is written slowly, in a typewriter style, but don't worry...",
+		       "(You can press SPACE anytime to resume)."]
+	},
+
+	{
+		title: "Wagner Paz",
+		image: "wagner-paz.png",
+		text: ["This box you are seeing right now, has a custom skin applied to it.",
+		       "I'll show you the default box style in the next frame,",
+		       "it's much simpler since it doesn't have any additional resources (skin)"]
+	}
+]}
