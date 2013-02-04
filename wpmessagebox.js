@@ -37,6 +37,7 @@ Crafty.c("WPMessageBox",
 		this._style    = style = this._processStyle(style);
 		this._txtIndex = 0;
 		
+		this._fixContent();
 		this._createNextIndicator();
 		this._createBackground();
 		this._createBorders();
@@ -51,7 +52,7 @@ Crafty.c("WPMessageBox",
 		
 		if(this._txt.finished)
         {
-            if(this._txtIndex < this._text.length)
+            if(this._txtIndex < this._text.content.length)
             {
                 this._createAndWriteText();
             }
@@ -81,6 +82,8 @@ Crafty.c("WPMessageBox",
             this._txt.destroy();
         }
         
+        var textContent = this._breakLines(this._text.content[this._txtIndex++].text);
+        
         //CREATE THE TEXT ENTITY
 		this._txt = Crafty.e("2D, DOM, WPTypewriter")
                           .attr({x: this._x + (2 * this._style.borderSize) + this._style.padding,
@@ -92,7 +95,7 @@ Crafty.c("WPMessageBox",
                           .css({'font-family': this._style.font.family,
                                 'font-size'  : this._style.font.size,
                                 'font-weight': this._style.font.weight})
-                          .write(this._text[this._txtIndex++], null, 75, 40)
+                          .write(textContent, null, 75, 40)
                           .bind("WPTypewriterFinished", function()
                           {
                               this._parent._nextIndicator.blinkStart();
@@ -124,6 +127,56 @@ Crafty.c("WPMessageBox",
 				this._background.color(this._style.background);
 			}
 		}
+	}
+,
+	_fixContent: function()
+	{
+		var fixed = null;
+		
+		if(this._text instanceof Array)
+		{
+			fixed = {content: this._text};
+		}
+		else if(typeof this._text == 'string')
+		{
+			fixed = {content: [{text : [this._text]}]};
+		}
+		else if(this._text instanceof Object)
+		{
+			fixed = this._text;
+			if(!fixed.content)
+			{
+				fixed.content = [];
+			}
+		}
+		
+		for(var i = 0; i < fixed.content.length; i++)
+		{
+			if(typeof fixed.content[i] == 'string')
+			{
+				fixed.content[i] = {text: [fixed.content[i]]};
+			}
+			else if(fixed.content[i] instanceof Array)
+			{
+				fixed.content[i] = {text: fixed.content[i]};
+			}
+			
+			if(typeof fixed.content[i].text == 'string')
+			{
+				fixed.content[i].text = [fixed.content[i].text];
+			}
+			
+			for(var j = 0; j < fixed.content[i].text.length; j++)
+			{
+				var text = fixed.content[i].text[j];
+				if(typeof text == 'string')
+				{
+					fixed.content[i].text[j] = text.split('\n');
+				}
+			}
+		}
+		
+		this._text = fixed;
 	}
 ,
 	_createNextIndicator: function()
@@ -298,6 +351,23 @@ Crafty.c("WPMessageBox",
 		if(style.nextIndicatorMargin == undefined) style.nextIndicatorMargin = 5;
 		
 		return style;
+	}
+,
+	_breakLines: function(stringArray)
+	{
+		var result = "";
+		if(stringArray !== undefined && stringArray instanceof Array)
+		{
+			for(var i = 0; i < stringArray.length; i++)
+			{
+				if(i != 0)
+				{
+					result += '\n';
+				}
+				result += stringArray[i];
+			}
+		}
+		return result;
 	}
 });
 
@@ -500,3 +570,55 @@ Crafty.loadMessageBoxSkin = function(path, onComplete)
 	
 	Crafty.load(resources, onComplete);
 };
+
+Crafty.extend(
+{
+	load: function(data, oncomplete, onprogress, onerror)
+	{
+		var i     = 0;
+		var qtReq = 0;
+		var qtRsp = 0;
+		
+		var checkComplete = function(sync)
+		{
+			if(qtReq == qtRsp && i == (data.length - (sync ? 1 : 0)))
+			{
+				oncomplete();
+			}
+		};
+		
+		for(i = 0; i < data.length; i++)
+		{
+			var current = data[i];
+			var suffix = ".json";
+			if(current.indexOf(suffix, current.length - suffix.length) !== -1)
+			{
+				qtReq++;
+				
+				if(!Crafty.asset(current))
+				{
+					var req = new XMLHttpRequest();
+					req.open("GET", data[i], false);
+					req.onreadystatechange = function()
+					{
+						if(req.readyState == 4 && req.status == 200)
+						{
+							Crafty.asset(current, JSON.parse(req.response));
+							qtRsp++;
+							checkComplete(true);
+						}
+					};
+					req.send(null);
+				}
+				else
+				{
+					qtRsp++;
+				}
+			}
+		}
+		
+		this._originalLoad(data, checkComplete, onprogress, onerror);
+	}
+,
+	_originalLoad: Crafty.load
+});

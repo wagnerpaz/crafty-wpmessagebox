@@ -1,4 +1,3 @@
-//WHEN THE DOM HAS LOADED
 window.onload = function()
 {
 	Crafty.init(400, 120);
@@ -6,12 +5,15 @@ window.onload = function()
 	
 	Crafty.scene("loading-test", function()
 	{
-		Crafty.loadMessageBoxSkin("round-metal", function()
-		{
-            Crafty.scene("test");
-        });
-		
 		Crafty.e("2D, DOM, Text").attr({x: 10, y: 10}).text("Loading..");
+		
+		Crafty.loadMessageBoxSkin("skin/round-metal", function()
+		{
+			Crafty.load(["text1.dlg.json", "text2.dlg.json"], function(obj)
+			{
+				Crafty.scene("test");
+			});
+		});
 	});
 	
 	Crafty.scene("test", function()
@@ -42,27 +44,13 @@ window.onload = function()
 
 function createAndShowBoxStyle1()
 {
-    var text = ["Hello! My name is Wagner Paz,\n"
-             +  "It's nice to meet you!\n"
-             +  "(Press SPACE to continue..)"
-
-             ,  "I'm here to show you my new Crafty component.\n"
-             +  "It's called WPMessageBox (pretty obvious, no?)"
-             ,  "It's a customizable RPG-like message box component.\n"
-             +  "The text is written slowly, in a typewriter style, but don't worry...\n"
-             +  "(You can press SPACE anytime to resume)."
-
-             ,  "This box you are seeing right now, has a custom skin applied to it.\n"
-             +  "I'll show you the default box style in the next frame,\n"
-             +  "it's much simpler since it doesn't require any additional resources."];
-	
 	return Crafty.e("2D, Canvas, WPMessageBox, Multiway, Keyboard")
                  .attr({x: 25,
                         y: 25,
                         w: 350,
                         h: 70,
                         z: 1})
-                 .messageBox(text,
+                 .messageBox(Crafty.asset("text1.dlg.json"),
                             {font: {family: 'Arial',
                                      weight: 'none',
                                      size  : '10px'},
@@ -73,7 +61,7 @@ function createAndShowBoxStyle1()
                              padding    : 0,
                              borderSize : 7,
                              borderColor: 'transparent',
-                             borderSkin : 'round-metal'
+                             borderSkin : 'skin/round-metal'
                             })
                  .multiway(3, {W: -90, A: 180, S: 90, D: 0})
                  .bind("KeyDown", function(e)
@@ -88,20 +76,13 @@ function createAndShowBoxStyle1()
 
 function createAndShowBoxStyleDefault()
 {
-	var text = ["And here whe are!\n"
-             +  "This ends the presentation.."
-
-             ,  "Thanks for watching!\n"
-             +  "For more information and a list of possible parameters\n"
-             +  "please refer to the documentation!"];
-	
 	return Crafty.e("2D, Canvas, WPMessageBox, Multiway, Keyboard")
                  .attr({x: 25,
                         y: 25,
                         w: 350,
                         h: 70,
                         z: 1})
-                 .messageBox(text, {font: {size: '12px'}})
+                 .messageBox(Crafty.asset("text2.dlg.json"), {font: {size: '12px'}})
                  .multiway(3, {W: -90, A: 180, S: 90, D: 0})
                  .bind("KeyDown", function(e)
                  {
