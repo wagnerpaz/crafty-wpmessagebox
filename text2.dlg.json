@@ -1,0 +1,16 @@
+[
+	{
+		"title": "Wagner Paz",
+		"image": "wagner-paz.png",
+		"text": ["And here whe are!",
+		         "This ends the presentation.."]
+	},
+
+	{
+		"title": "Wagner Paz",
+		"image": "wagner-paz.png",
+		"text": ["Thanks for watching!",
+		         "For more information and a list of possible parameters",
+		         "please refer to the documentation!"]
+	}
+]
